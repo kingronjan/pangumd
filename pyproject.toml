@@ -1,0 +1,22 @@
+[project]
+name = "pangu-py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+draft = [
+    "marko>=2.2.2",
+]
+test = [
+    "pytest>=9.0.2",
+]
+
+[tool.pytest]
+minversion = "9.0"
+python_functions = ["test_*"]
+testpaths = [
+    "tests",
+]

@@ -111,7 +111,7 @@ def spacing(text):
 
     new_text = CJK_QUOTE.sub(r'\1 \2', new_text)
     new_text = QUOTE_CJK.sub(r'\1 \2', new_text)
-    new_text = FIX_QUOTE_ANY_QUOTE.sub(r'\1\3\5', new_text)
+    new_text = FIX_QUOTE_ANY_QUOTE.sub(r'\1\3\5', new_text)  # error for code like ``` `` ` ```
 
     new_text = CJK_SINGLE_QUOTE_BUT_POSSESSIVE.sub(r'\1 \2', new_text)
     new_text = SINGLE_QUOTE_CJK.sub(r'\1 \2', new_text)
