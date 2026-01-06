@@ -3,11 +3,11 @@
 """
 Paranoid text spacing for good readability, to automatically insert whitespace between CJK (Chinese, Japanese, Korean) and half-width characters (alphabetical letters, numerical digits and symbols).
 
->>> import pangu
->>> nwe_text = pangu.spacing_text('當你凝視著bug，bug也凝視著你')
+>>> import pangumd
+>>> nwe_text = pangumd.spacing_text('當你凝視著bug，bug也凝視著你')
 >>> print(nwe_text)
 '當你凝視著 bug，bug 也凝視著你'
->>> nwe_content = pangu.spacing_file('path/to/file.txt')
+>>> nwe_content = pangumd.spacing_file('path/to/file.txt')
 >>> print(nwe_content)
 '與 PM 戰鬥的人，應當小心自己不要成為 PM'
 """
@@ -222,8 +222,8 @@ def cli(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser(
-        prog='pangu',
-        description='pangu.py -- Paranoid text spacing for good readability, to automatically insert whitespace between CJK and half-width characters (alphabetical letters, numerical digits and symbols).',
+        prog='pangumd',
+        description='pangumd.py -- Paranoid text spacing for good readability, to automatically insert whitespace between CJK and half-width characters (alphabetical letters, numerical digits and symbols).',
     )
     parser.add_argument('-v', '--version', action='version', version=__version__)
     parser.add_argument('-t', '--text', action='store_true', dest='is_text', required=False, help='specify the input value is a text')

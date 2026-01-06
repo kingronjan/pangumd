@@ -39,9 +39,9 @@ wheels = [
 ]
 
 [[package]]
-name = "pangu-py"
+name = "pangu-md"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 
 [package.dev-dependencies]
 draft = [
