@@ -1,4 +1,4 @@
-# pangu.py
+# pangumd
 
 This project is a fork of [vinta/pangu.py: Paranoid text spacing in Python](https://github.com/vinta/pangu.py).
 
@@ -18,55 +18,53 @@ This version adds special adaptations for Markdown syntax on top of the original
 
 ## Installation
 
-```bash
-pip install -U pangu
-```
+Just clone it.
 
 ## Usage
 
 ### In Python
 
 ```python
-import pangu
+import pangumd
 
-new_text = pangu.spacing_text('當你凝視著bug，bug也凝視著你')
+new_text = pangumd.spacing_text('當你凝視著bug，bug也凝視著你')
 # new_text = '當你凝視著 bug，bug 也凝視著你'
 
-nwe_content = pangu.spacing_file('path/to/file.txt')
+nwe_content = pangumd.spacing_file('path/to/file.txt')
 # nwe_content = '與 PM 戰鬥的人，應當小心自己不要成為 PM'
 ```
 
 ### In CLI
 
 ```bash
-$ pangu "請使用uname -m指令來檢查你的Linux作業系統是32位元或是64位元"
+$ pangumd "請使用uname -m指令來檢查你的Linux作業系統是32位元或是64位元"
 請使用 uname -m 指令來檢查你的 Linux 作業系統是 32 位元或是 64 位元
 
-$ python -m pangu "為什麼小明有問題都不Google？因為他有Bing"
+$ python -m pangumd "為什麼小明有問題都不Google？因為他有Bing"
 為什麼小明有問題都不 Google？因為他有 Bing
 
 $ echo "未來的某一天，Gmail配備的AI可能會得出一個結論：想要消滅垃圾郵件最好的辦法就是消滅人類" >> path/to/file.txt
-$ pangu -f path/to/file.txt >> pangu_file.txt
+$ pangumd -f path/to/file.txt >> pangu_file.txt
 $ cat pangu_file.txt
 未來的某一天，Gmail 配備的 AI 可能會得出一個結論：想要消滅垃圾郵件最好的辦法就是消滅人類
 
-$ echo "心裡想的是Microservice，手裡做的是Distributed Monolith" | pangu
+$ echo "心裡想的是Microservice，手裡做的是Distributed Monolith" | pangumd
 心裡想的是 Microservice，手裡做的是 Distributed Monolith
 
-$ echo "你從什麼時候開始產生了我沒使用Monkey Patch的錯覺?" | python -m pangu
+$ echo "你從什麼時候開始產生了我沒使用Monkey Patch的錯覺?" | python -m pangumd
 你從什麼時候開始產生了我沒使用 Monkey Patch 的錯覺？
 ```
 
 ## Pre-commit Hook
 
-To use pangu.py as a pre-commit hook, add the following to your `.pre-commit-config.yaml`:
+To use pangumd as a pre-commit hook, add the following to your `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/your-username/pangu.py
+  - repo: https://github.com/kingronjan/pangumd
     rev: main  # or a specific version tag
     hooks:
-      - id: pangu-spacing
+      - id: pangumd
         files: \.(md|txt|rst)$
 ```
 
@@ -76,7 +74,7 @@ Then install the hook:
 pre-commit install
 ```
 
-Now pangu.py will automatically run on your Markdown and text files before each commit, ensuring proper spacing between CJK and half-width characters.
+Now pangumd will automatically run on your Markdown and text files before each commit, ensuring proper spacing between CJK and half-width characters.
 
 ## License
 
