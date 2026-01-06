@@ -84,6 +84,55 @@ def convert_to_fullwidth(symbols):
     return symbols.strip()
 
 
+def _protect_markdown_syntax(text):
+    """
+    Protect markdown bold and italic syntax by replacing them with placeholders.
+    Returns a tuple of (protected_text, patterns_list).
+    """
+    markdown_patterns = []
+    def protect_markdown(match):
+        markdown_patterns.append(match.group(0))
+        return f'\x00MARKDOWN{len(markdown_patterns) - 1}\x00'
+    
+    # Protect **text** patterns
+    protected_text = re.sub(r'(\*\*)([^*]+?)(\*\*)', protect_markdown, text)
+    # Protect *text* patterns (but not **text**)
+    protected_text = re.sub(r'(?<!\*)(\*)(?!\*)([^*]+?)(?<!\*)(\*)(?!\*)', protect_markdown, protected_text)
+    
+    return protected_text, markdown_patterns
+
+
+def _restore_markdown_syntax(text, markdown_patterns):
+    """
+    Restore markdown patterns from placeholders with proper spacing.
+    """
+    for i, pattern in enumerate(markdown_patterns):
+        # Check if we need to add spaces around the markdown pattern
+        placeholder = f'\x00MARKDOWN{i}\x00'
+        if placeholder in text:
+            # Find the context around the placeholder
+            idx = text.find(placeholder)
+            prev_char = text[idx - 1] if idx > 0 else ''
+            next_char = text[idx + len(placeholder)] if idx + len(placeholder) < len(text) else ''
+            
+            # Determine if we need spaces
+            # Rule: Add space before if prev_char is CJK or ANS
+            # Rule: Add space after only if prev_char is CJK (not if prev_char is ANS)
+            needs_space_before = prev_char and (bool(ANY_CJK.match(prev_char)) or prev_char.isalnum())
+            needs_space_after = prev_char and bool(ANY_CJK.match(prev_char)) and next_char and bool(ANY_CJK.match(next_char))
+            
+            # Add spaces if needed
+            replacement = pattern
+            if needs_space_before:
+                replacement = ' ' + replacement
+            if needs_space_after:
+                replacement = replacement + ' '
+            
+            text = text.replace(placeholder, replacement)
+    
+    return text
+
+
 def spacing(text):
     """
     Perform paranoid text spacing on text.
@@ -92,6 +141,9 @@ def spacing(text):
         return text
 
     new_text = text
+
+    # Protect markdown bold and italic syntax
+    new_text, markdown_patterns = _protect_markdown_syntax(new_text)
 
     # TODO: refactoring
     matched = CONVERT_TO_FULLWIDTH_CJK_SYMBOLS_CJK.search(new_text)
@@ -142,6 +194,9 @@ def spacing(text):
     new_text = S_A.sub(r'\1 \2', new_text)
 
     new_text = MIDDLE_DOT.sub('・', new_text)
+
+    # Restore markdown patterns with proper spacing
+    new_text = _restore_markdown_syntax(new_text, markdown_patterns)
 
     return new_text.strip()
 
