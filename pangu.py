@@ -31,7 +31,7 @@ FIX_CJK_COLON_ANS = re.compile('([{CJK}])\\:([A-Z0-9\\(\\)])'.format(CJK=CJK))
 
 CJK_QUOTE = re.compile('([{CJK}])([`"\u05f4])'.format(CJK=CJK))  # no need to escape `
 QUOTE_CJK = re.compile('([`"\u05f4])([{CJK}])'.format(CJK=CJK))  # no need to escape `
-FIX_QUOTE_ANY_QUOTE = re.compile(r'([`"\u05f4]+)(\s*)(.+?)(\s*)([`"\u05f4]+)')
+FIX_QUOTE_ANY_QUOTE = re.compile(r'(?<!`)([`"\u05f4])(\s*)(.+?)(\s*)([`"\u05f4])(?!`)')
 
 CJK_SINGLE_QUOTE_BUT_POSSESSIVE = re.compile("([{CJK}])('[^s])".format(CJK=CJK))
 SINGLE_QUOTE_CJK = re.compile("(')([{CJK}])".format(CJK=CJK))
