@@ -94,41 +94,69 @@ def _protect_markdown_syntax(text):
         markdown_patterns.append(match.group(0))
         return f'\x00MARKDOWN{len(markdown_patterns) - 1}\x00'
     
-    # Protect **text** patterns
-    protected_text = re.sub(r'(\*\*)([^*]+?)(\*\*)', protect_markdown, text)
-    # Protect *text* patterns (but not **text**)
-    protected_text = re.sub(r'(?<!\*)(\*)(?!\*)([^*]+?)(?<!\*)(\*)(?!\*)', protect_markdown, protected_text)
+    # Protect **text** patterns (but not inside backticks)
+    protected_text = re.sub(r'(?<!`)(\*\*)([^*`]+?)(\*\*)(?!`)', protect_markdown, text)
+    # Protect *text* patterns (but not **text** and not inside backticks)
+    # Use word boundaries to ensure we don't match parts of **text**
+    protected_text = re.sub(r'(?<!`)(?<!\*)(\*)(?!\*)([^*\n`]+?)(?<!\*)(\*)(?!\*)(?!`)', protect_markdown, protected_text)
     
     return protected_text, markdown_patterns
 
 
 def _restore_markdown_syntax(text, markdown_patterns):
     """
-    Restore markdown patterns from placeholders with proper spacing.
+    Restore markdown patterns from placeholders with intelligent spacing.
     """
     for i, pattern in enumerate(markdown_patterns):
-        # Check if we need to add spaces around the markdown pattern
         placeholder = f'\x00MARKDOWN{i}\x00'
-        if placeholder in text:
-            # Find the context around the placeholder
-            idx = text.find(placeholder)
-            prev_char = text[idx - 1] if idx > 0 else ''
-            next_char = text[idx + len(placeholder)] if idx + len(placeholder) < len(text) else ''
-            
-            # Determine if we need spaces
-            # Rule: Add space before if prev_char is CJK or ANS
-            # Rule: Add space after only if prev_char is CJK (not if prev_char is ANS)
-            needs_space_before = prev_char and (bool(ANY_CJK.match(prev_char)) or prev_char.isalnum())
-            needs_space_after = prev_char and bool(ANY_CJK.match(prev_char)) and next_char and bool(ANY_CJK.match(next_char))
-            
-            # Add spaces if needed
-            replacement = pattern
-            if needs_space_before:
-                replacement = ' ' + replacement
-            if needs_space_after:
-                replacement = replacement + ' '
-            
-            text = text.replace(placeholder, replacement)
+        if placeholder not in text:
+            continue
+        
+        # Find the context around the placeholder
+        idx = text.find(placeholder)
+        prev_char = text[idx - 1] if idx > 0 else ''
+        next_char = text[idx + len(placeholder)] if idx + len(placeholder) < len(text) else ''
+        
+        # Extract the content inside the markdown syntax (without the ** or * markers)
+        # For **text**, extract "text"
+        content = pattern
+        if pattern.startswith('**') and pattern.endswith('**'):
+            content = pattern[2:-2]
+        elif pattern.startswith('*') and pattern.endswith('*'):
+            content = pattern[1:-1]
+        
+        # Determine if the content contains CJK
+        has_cjk = bool(ANY_CJK.search(content))
+        
+        # Determine if we need spaces
+        # Rule: Add space before if prev_char is CJK or ANS (and there's no space already)
+        # Rule: Add space after if next_char is CJK, but only if prev_char is also CJK (and there's no space already)
+        needs_space_before = False
+        needs_space_after = False
+        
+        if prev_char:
+            if bool(ANY_CJK.match(prev_char)):
+                # CJK before markdown, need space
+                needs_space_before = True
+            elif prev_char.isalnum():
+                # ANS before markdown, need space
+                needs_space_before = True
+        
+        if next_char:
+            if bool(ANY_CJK.match(next_char)):
+                # CJK after markdown
+                # Only add space if prev_char is also CJK
+                if prev_char and bool(ANY_CJK.match(prev_char)):
+                    needs_space_after = True
+        
+        # Build replacement
+        replacement = pattern
+        if needs_space_before and prev_char != ' ':
+            replacement = ' ' + replacement
+        if needs_space_after and next_char != ' ':
+            replacement = replacement + ' '
+        
+        text = text.replace(placeholder, replacement, 1)
     
     return text
 
@@ -139,10 +167,16 @@ def spacing(text):
     """
     if len(text) <= 1 or not ANY_CJK.search(text):
         return text
+    
+    # If text contains multiple lines (not just trailing newline), it might be a markdown document, return as-is
+    # Count the number of newlines, ignoring trailing newline
+    text_without_trailing_newline = text.rstrip('\n')
+    if '\n' in text_without_trailing_newline:
+        return text
 
     new_text = text
 
-    # Protect markdown bold and italic syntax
+    # Protect markdown bold and italic syntax FIRST
     new_text, markdown_patterns = _protect_markdown_syntax(new_text)
 
     # TODO: refactoring
@@ -155,7 +189,7 @@ def spacing(text):
     matched = CONVERT_TO_FULLWIDTH_CJK_SYMBOLS.search(new_text)
     while matched:
         start, end = matched.span()
-        new_text = ''.join((new_text[:start + 1].strip(), convert_to_fullwidth(new_text[start + 1:end]), new_text[end:].strip()))
+        new_text = ''.join((new_text[:start + 1], convert_to_fullwidth(new_text[start + 1:end]), new_text[end:]))
         matched = CONVERT_TO_FULLWIDTH_CJK_SYMBOLS.search(new_text)
 
     new_text = DOTS_CJK.sub(r'\1 \2', new_text)
@@ -198,7 +232,7 @@ def spacing(text):
     # Restore markdown patterns with proper spacing
     new_text = _restore_markdown_syntax(new_text, markdown_patterns)
 
-    return new_text.strip()
+    return new_text.rstrip()
 
 
 def spacing_text(text):
