@@ -1,0 +1,10 @@
+# Command: test
+# Description: Intelligently run tests based on your current context and actively help fix failures
+# Category: testing
+# Version: 1
+
+description = "运行并修复测试"
+
+prompt = """
+使用 `uv run -m pytest` 运行测试，并修复问题，注意绝对不允许修改测试代码。
+"""

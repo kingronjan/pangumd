@@ -18,15 +18,13 @@
 
 ```
 pangu.py/
-├── pangu.py              # 主程序文件，包含核心算法和 CLI
+├── pangumd.py            # 主程序文件，包含核心算法和 CLI
 ├── tests/                # 测试目录
 │   ├── test_pangu.py     # 主要测试文件
 │   ├── test_markdown.py  # Markdown 相关测试
 │   └── fixtures/         # 测试数据
 ├── pyproject.toml        # 现代 Python 项目配置（使用 uv）
-├── setup.py              # 传统 setuptools 配置
-├── Makefile              # 构建和发布脚本
-└── README.rst            # 项目文档
+└── README.md             # 项目文档
 ```
 
 ## 构建和运行
@@ -90,27 +88,13 @@ echo "心裡想的是Microservice" | pangu
 python -m pangu "為什麼小明有問題都不Google？"
 ```
 
-### 构建和发布
-
-```bash
-# 清理构建文件
-make clean
-
-# 打包
-make pack
-
-# 发布到 PyPI
-make publish
-```
-
 ## 开发约定
 
 ### 代码风格
 
 - 使用 UTF-8 编码
 - 遵循 Python PEP 8 规范
-- 使用正则表达式进行文本处理
-- 主程序文件为单文件模块（pangu.py）
+- 主程序文件为单文件模块（pangumd.py）
 
 ### 测试约定
 
@@ -118,7 +102,6 @@ make publish
 - 测试文件位于 `tests/` 目录
 - 测试函数命名以 `test_` 开头
 - 测试使用断言进行验证
-- 包含 57 个测试用例，覆盖各种字符组合和边界情况
 
 ### 核心算法说明
 
@@ -133,15 +116,8 @@ make publish
 
 ### 版本管理
 
-- 版本号定义在 `pangu.py` 中的 `__version__` 变量
-- 当前版本：4.0.6.1
+- 版本号定义在 `pangumd.py` 中的 `__version__` 变量
 - 使用语义化版本控制
-
-### CI/CD
-
-- 使用 Travis CI 进行持续集成
-- 测试覆盖 Python 3.3-3.7
-- 使用 codecov 进行代码覆盖率统计
 
 ## 常见任务
 
@@ -153,16 +129,10 @@ make publish
 
 核心算法位于 `pangu.py` 的 `spacing()` 函数中。修改后务必运行完整的测试套件确保没有破坏现有功能。
 
-### 发布新版本
-
-1. 更新 `pangu.py` 中的 `__version__`
-2. 更新 `HISTORY.rst` 添加版本说明
-3. 运行 `make pack` 构建包
-4. 运行 `make publish` 发布到 PyPI
 
 ## 注意事项
 
-- 项目不支持 Python 2.7（已在 4.0.6.1 版本移除）
+- 项目不支持 Python 2.7
 - 正则表达式处理需要特别注意边界情况，特别是 markdown 代码块
 - 测试覆盖率要求高，任何修改都应该通过所有现有测试
 - 使用 uv 进行依赖管理时，确保 `.venv` 目录被正确忽略
