@@ -1,8 +1,11 @@
-[command]
-name = "release"
+# Command: release
+# Description: 自动化版本发布流程：准备 tag 号、更新版本号、创建 tag 并推送
+# Category: release
+# Version: 1
+
 description = "自动化版本发布流程：准备 tag 号、更新版本号、创建 tag 并推送"
 
-[prompt]
+prompt = """
 你是一个版本发布自动化工具，需要执行以下步骤：
 
 1. **获取最新 tag**：运行 `git tag -l --sort=-v:refname | head -1` 获取最新的 tag 号
@@ -27,3 +30,4 @@ description = "自动化版本发布流程：准备 tag 号、更新版本号、
 - 使用中文回复用户
 
 开始执行版本发布流程。
+"""
