@@ -35,7 +35,7 @@ def test_json_code_block_not_modified():
 
 def test_bold_font():
     assert pangumd.spacing_text("Hello**你好**吗") == "Hello **你好**吗"
-    assert pangumd.spacing_text("今天的天气**很不错**哦") == "今天的天气 **很不错** 哦"
+    assert pangumd.spacing_text("今天的天气**很不错**哦") == "今天的天气**很不错**哦"
     
     text = dedent("""
     * **column**
@@ -61,3 +61,9 @@ def test_function_call_not_modified():
     请使用 `function_call(param1, param2)` 来调用函数。
     """)
     assert pangumd.spacing_text(text) == text
+
+
+def test_multipleline_content():
+    content='## 相关项目\n- [pydantic/pydantic-settings: Settings management using pydantic](https://github.com/pydantic/pydantic-settings) 使用 pydantic 作为 settings 配置（以python 类的形式），可以按优先级从 `.env`，env，命令行参数中获取配置值，并将配置值转换指定的数据格式\n'
+
+    assert pangumd.spacing_text(content) == '## 相关项目\n- [pydantic/pydantic-settings: Settings management using pydantic](https://github.com/pydantic/pydantic-settings) 使用 pydantic 作为 settings 配置（以 python 类的形式），可以按优先级从 `.env`，env，命令行参数中获取配置值，并将配置值转换指定的数据格式\n'

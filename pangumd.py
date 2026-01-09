@@ -94,8 +94,12 @@ def _protect_markdown_syntax(text):
         markdown_patterns.append(match.group(0))
         return f'\x00MARKDOWN{len(markdown_patterns) - 1}\x00'
     
+    # Protect inline code patterns first (before bold/italic)
+    # Match `code` but not ```code``` (code blocks)
+    protected_text = re.sub(r'(?<!`)`([^`\n]+)`(?!`)', protect_markdown, text)
+    
     # Protect **text** patterns (but not inside backticks)
-    protected_text = re.sub(r'(?<!`)(\*\*)([^*`]+?)(\*\*)(?!`)', protect_markdown, text)
+    protected_text = re.sub(r'(?<!`)(\*\*)([^*`]+?)(\*\*)(?!`)', protect_markdown, protected_text)
     # Protect *text* patterns (but not **text** and not inside backticks)
     # Use word boundaries to ensure we don't match parts of **text**
     protected_text = re.sub(r'(?<!`)(?<!\*)(\*)(?!\*)([^*\n`]+?)(?<!\*)(\*)(?!\*)(?!`)', protect_markdown, protected_text)
@@ -129,24 +133,36 @@ def _restore_markdown_syntax(text, markdown_patterns):
         has_cjk = bool(ANY_CJK.search(content))
         
         # Determine if we need spaces
-        # Rule: Add space before if prev_char is CJK or ANS (and there's no space already)
-        # Rule: Add space after if next_char is CJK, but only if prev_char is also CJK (and there's no space already)
+        # Different rules for different markdown syntax:
+        # - For backticks (inline code): Add space with CJK and ANS
+        # - For **/* (bold/italic): Add space only with ANS, NOT with CJK
         needs_space_before = False
         needs_space_after = False
         
+        is_backtick = pattern.startswith('`') and pattern.endswith('`')
+        
         if prev_char:
-            if bool(ANY_CJK.match(prev_char)):
-                # CJK before markdown, need space
-                needs_space_before = True
-            elif prev_char.isalnum():
-                # ANS before markdown, need space
-                needs_space_before = True
+            if is_backtick:
+                # For backticks, add space with CJK and ANS
+                if bool(ANY_CJK.match(prev_char)) or prev_char.isalnum() or prev_char in '.,;:!?()[]{}"\'':
+                    needs_space_before = True
+            else:
+                # For **/*, add space only with ANS, NOT with CJK
+                if bool(ANY_CJK.match(prev_char)):
+                    needs_space_before = False
+                elif prev_char.isalnum() or prev_char in '.,;:!?()[]{}"\'':
+                    needs_space_before = True
         
         if next_char:
-            if bool(ANY_CJK.match(next_char)):
-                # CJK after markdown
-                # Only add space if prev_char is also CJK
-                if prev_char and bool(ANY_CJK.match(prev_char)):
+            if is_backtick:
+                # For backticks, add space with CJK and ANS
+                if bool(ANY_CJK.match(next_char)) or next_char.isalnum() or next_char in '.,;:!?()[]{}"\'':
+                    needs_space_after = True
+            else:
+                # For **/*, add space only with ANS, NOT with CJK
+                if bool(ANY_CJK.match(next_char)):
+                    needs_space_after = False
+                elif next_char.isalnum() or next_char in '.,;:!?()[]{}"\'':
                     needs_space_after = True
         
         # Build replacement
@@ -168,10 +184,14 @@ def spacing(text):
     if len(text) <= 1 or not ANY_CJK.search(text):
         return text
     
+    # If text contains markdown code blocks (```), skip processing to preserve them
+    if '```' in text:
+        return text
+    
     # If text contains multiple lines (not just trailing newline), it might be a markdown document, return as-is
     # Count the number of newlines, ignoring trailing newline
     text_without_trailing_newline = text.rstrip('\n')
-    if '\n' in text_without_trailing_newline:
+    if '\n' in text_without_trailing_newline and text_without_trailing_newline.count('\n') > 1:
         return text
 
     new_text = text
@@ -232,7 +252,18 @@ def spacing(text):
     # Restore markdown patterns with proper spacing
     new_text = _restore_markdown_syntax(new_text, markdown_patterns)
 
-    return new_text.rstrip()
+    # Remove trailing whitespace but preserve at most one trailing newline
+    new_text = new_text.rstrip(' \t')
+    if new_text.endswith('\n\n'):
+        new_text = new_text.rstrip('\n') + '\n'
+    elif new_text.endswith('\n'):
+        # Keep single trailing newline
+        pass
+    else:
+        # No trailing newline, strip all whitespace
+        new_text = new_text.rstrip()
+    
+    return new_text
 
 
 def spacing_text(text):
@@ -248,7 +279,9 @@ def spacing_file(path):
     """
     # TODO: read line by line
     with open(os.path.abspath(path)) as f:
-        return spacing_text(f.read())
+        result = spacing_text(f.read())
+        # Remove trailing newlines for file output
+        return result.rstrip('\n')
 
 
 def cli(args=None):
