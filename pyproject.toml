@@ -8,7 +8,9 @@ version = "0.1.6"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "mistletoe>=1.5.1",
+]
 
 [project.scripts]
 pangumd = "pangumd:cli"
@@ -17,6 +19,7 @@ pangufiles = "pangumd:cli_files"
 [dependency-groups]
 draft = [
     "marko>=2.2.2",
+    "pangu>=4.0.6.1",
 ]
 test = [
     "pytest>=9.0.2",

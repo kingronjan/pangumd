@@ -17,6 +17,13 @@ import os
 import re
 import sys
 
+try:
+    from mistletoe import Document
+    from mistletoe.ast_renderer import ASTRenderer
+    MISTLETOE_AVAILABLE = True
+except ImportError:
+    MISTLETOE_AVAILABLE = False
+
 __version__ = '0.1.6'
 __all__ = ['spacing_text', 'spacing_file', 'spacing', 'cli']
 
@@ -271,19 +278,202 @@ def spacing(text):
 def spacing_text(text):
     """
     Perform paranoid text spacing on text. An alias of `spacing()`.
+    Automatically detects markdown content and uses mistletoe parser if available.
     """
-    return spacing(text)
+    # Check if text looks like markdown (contains markdown syntax)
+    is_markdown = False
+    if MISTLETOE_AVAILABLE:
+        # Simple heuristics to detect markdown
+        markdown_indicators = [
+            '```',  # code blocks
+            '**',  # bold
+            '*',   # italic
+            '#',   # headers
+            '[',   # links
+            '- ',  # lists
+            '* ',  # lists
+        ]
+        if any(indicator in text for indicator in markdown_indicators):
+            is_markdown = True
+    
+    if is_markdown:
+        return spacing_markdown(text)
+    else:
+        return spacing(text)
+
+
+def spacing_markdown(text):
+    """
+    Perform paranoid text spacing on markdown text using mistletoe parser.
+    This function uses mistletoe to identify markdown syntax and only applies
+    spacing to text content, preserving markdown syntax structure.
+    
+    Args:
+        text: The markdown text to process
+        
+    Returns:
+        The processed markdown text with proper spacing
+    """
+    if not MISTLETOE_AVAILABLE:
+        # Fallback to regular spacing if mistletoe is not available
+        return spacing(text)
+    
+    try:
+        # Parse markdown into AST
+        document = Document(text)
+        
+        # Collect all text ranges that should be processed
+        # and all ranges that should be skipped (code blocks, inline code, etc.)
+        text_ranges = []
+        skip_ranges = []
+        
+        # Function to collect ranges from AST nodes
+        def collect_ranges(node, offset=0):
+            node_type = getattr(node, 'type', None)
+            
+            # Skip processing for code blocks and inline code
+            if node_type in ['CodeBlock', 'FencedCode', 'InlineCode']:
+                if hasattr(node, 'line_number') and hasattr(node, 'content'):
+                    # Find the position of this node in the original text
+                    # This is a simplified approach - in practice, we'd need to track positions
+                    pass
+                return
+            
+            # Process children
+            if hasattr(node, 'children'):
+                for child in node.children:
+                    collect_ranges(child, offset)
+            
+            # Collect text content from RawText nodes
+            if node_type == 'RawText':
+                if hasattr(node, 'content') and isinstance(node.content, str):
+                    # Store the content for later processing
+                    text_ranges.append(node.content)
+        
+        # Collect all text ranges
+        collect_ranges(document)
+        
+        # Process each text range
+        processed_ranges = [spacing(content) for content in text_ranges]
+        
+        # Since we can't easily map back to the original text positions,
+        # we'll use a different approach: use mistletoe to rebuild the markdown
+        # with processed text content
+        
+        # Function to rebuild markdown from AST with processed text
+        def rebuild_markdown(node):
+            node_type = getattr(node, 'type', None)
+            
+            # Handle different node types
+            if node_type == 'Document':
+                result = ''
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result
+            elif node_type == 'Paragraph':
+                result = ''
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result + '\n\n'
+            elif node_type == 'Heading':
+                level = getattr(node, 'level', 1)
+                result = '#' * level + ' '
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result + '\n\n'
+            elif node_type == 'List':
+                result = ''
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result
+            elif node_type == 'ListItem':
+                result = '* '
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result
+            elif node_type == 'Strong':
+                result = '**'
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result + '**'
+            elif node_type == 'Emphasis':
+                result = '*'
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result + '*'
+            elif node_type == 'InlineCode':
+                return '`' + getattr(node, 'content', '') + '`'
+            elif node_type == 'CodeBlock':
+                language = getattr(node, 'language', '')
+                content = getattr(node, 'content', '')
+                return f'```{language}\n{content}\n```\n'
+            elif node_type == 'Link':
+                target = getattr(node, 'target', '')
+                result = '['
+                for child in node.children:
+                    result += rebuild_markdown(child)
+                return result + f']({target})'
+            elif node_type == 'RawText':
+                content = getattr(node, 'content', '')
+                return spacing(content)
+            else:
+                # Default: try to process children
+                result = ''
+                if hasattr(node, 'children'):
+                    for child in node.children:
+                        result += rebuild_markdown(child)
+                return result
+        
+        # Rebuild markdown with processed text
+        return rebuild_markdown(document).rstrip() + '\n'
+        
+    except Exception:
+        # If mistletoe parsing fails, fallback to regular spacing
+        return spacing(text)
 
 
 def spacing_file(path):
     """
-    Perform paranoid text spacing from file.
+    Perform paranoid text spacing on file content.
+    Automatically detects markdown files and uses mistletoe parser if available.
+    
+    Args:
+        path: The file path to read and process
+        
+    Returns:
+        The processed file content with proper spacing
     """
     # TODO: read line by line
-    with open(os.path.abspath(path)) as f:
-        result = spacing_text(f.read())
-        # Remove trailing newlines for file output
-        return result.rstrip('\n')
+    with open(os.path.abspath(path), encoding='utf-8') as f:
+        content = f.read()
+        
+        # Check if file is markdown by extension
+        is_markdown = path.endswith('.md') or path.endswith('.markdown')
+        
+        if is_markdown and MISTLETOE_AVAILABLE:
+            result = spacing_markdown(content)
+            # Preserve trailing newlines for markdown files
+            return result
+        else:
+            result = spacing_text(content)
+            # Remove trailing newlines for file output
+            return result.rstrip('\n')
+
+
+def spacing_markdown_file(path):
+    """
+    Perform paranoid text spacing on markdown file content using mistletoe parser.
+    
+    Args:
+        path: The markdown file path to read and process
+        
+    Returns:
+        The processed markdown file content with proper spacing
+    """
+    with open(os.path.abspath(path), encoding='utf-8') as f:
+        result = spacing_markdown(f.read())
+        # Preserve trailing newlines for markdown files
+        return result
 
 
 def cli(args=None):

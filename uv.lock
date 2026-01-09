@@ -30,6 +30,15 @@ wheels = [
 ]
 
 [[package]]
+name = "mistletoe"
+version = "1.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/ae/d33647e2a26a8899224f36afc5e7b7a670af30f1fd87231e9f07ca19d673/mistletoe-1.5.1.tar.gz", hash = "sha256:c5571ce6ca9cfdc7ce9151c3ae79acb418e067812000907616427197648030a3", size = 111769, upload-time = "2025-12-07T16:19:01.066Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/60/0980fefdc4d12c18c1bbab9d62852f27aded8839233c7b0a9827aaf395f5/mistletoe-1.5.1-py3-none-any.whl", hash = "sha256:d3e97664798261503f685f6a6281b092628367cf3128fc68a015a993b0c4feb3", size = 55331, upload-time = "2025-12-07T16:18:59.65Z" },
+]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 source = { registry = "https://pypi.org/simple" }
@@ -39,22 +48,39 @@ wheels = [
 ]
 
 [[package]]
+name = "pangu"
+version = "4.0.6.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/dd/55a1e9d35ac17f49869359b2197fc09d17ee024ba545985b49b3e75a870a/pangu-4.0.6.1.tar.gz", hash = "sha256:f799d127709fe5ecff5d476945ac63d4be758b7bda02efb95715f1dc24472a2f", size = 6288, upload-time = "2019-02-08T18:17:30.527Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/48/77/b52fac2ca4e4596f22dd6200b99ad515fb64b1ae7d3a12325b45b11e2a67/pangu-4.0.6.1-py3-none-any.whl", hash = "sha256:5023dced34b48da7ec61a2847efcbb8cf4fb748f8e589e1e7dfb008b7ad00206", size = 6401, upload-time = "2019-02-08T18:17:28.142Z" },
+]
+
+[[package]]
 name = "pangu-md"
-version = "0.1.5"
+version = "0.1.6"
 source = { editable = "." }
+dependencies = [
+    { name = "mistletoe" },
+]
 
 [package.dev-dependencies]
 draft = [
     { name = "marko" },
+    { name = "pangu" },
 ]
 test = [
     { name = "pytest" },
 ]
 
 [package.metadata]
+requires-dist = [{ name = "mistletoe", specifier = ">=1.5.1" }]
 
 [package.metadata.requires-dev]
-draft = [{ name = "marko", specifier = ">=2.2.2" }]
+draft = [
+    { name = "marko", specifier = ">=2.2.2" },
+    { name = "pangu", specifier = ">=4.0.6.1" },
+]
 test = [{ name = "pytest", specifier = ">=9.0.2" }]
 
 [[package]]
