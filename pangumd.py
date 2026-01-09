@@ -24,7 +24,7 @@ def spacing(text):
 
         "this is**示例**over." -> "this is **示例** over."
 
-    处理完成后使用 mistune 将解析树重新渲染为 markdown 文本并返回。
+    处理完成后使用 mistune.renderers.markdown.MarkdownRenderer 将解析树重新渲染为 markdown 文本并返回。
     """
     return pangu.spacing(text)
 
