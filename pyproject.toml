@@ -14,7 +14,7 @@ dependencies = [
 
 [project.scripts]
 pangumd = "pangumd:cli"
-pangufiles = "pangumd:cli_files"
+pangufiles = "pangumd:cli"
 
 [dependency-groups]
 draft = [

@@ -100,11 +100,11 @@ class TestSpacing(TestPangu):
         assert pangumd.spacing('得到一個A&B的結果') == '得到一個 A&B 的結果'
 
     def test_asterisk(self):
-        assert pangumd.spacing('前面*後面') == '前面 * 後面'
-        assert pangumd.spacing('前面 * 後面') == '前面 * 後面'
+        assert pangumd.spacing('前面*後面') == '前面*後面'
+        assert pangumd.spacing('前面*後面') == '前面*後面'
         assert pangumd.spacing('Vinta*Mollie') == 'Vinta*Mollie'
-        assert pangumd.spacing('Vinta*陳上進') == 'Vinta * 陳上進'
-        assert pangumd.spacing('陳上進*Vinta') == '陳上進 * Vinta'
+        assert pangumd.spacing('Vinta*陳上進') == 'Vinta*陳上進'
+        assert pangumd.spacing('陳上進*Vinta') == '陳上進*Vinta'
         assert pangumd.spacing('得到一個A*B的結果') == '得到一個 A*B 的結果'
 
     def test_minus(self):
@@ -350,7 +350,7 @@ class TestSpacing(TestPangu):
 class TestSpacingText(TestPangu):
 
     def test_spacing_text(self):
-        assert pangumd.spacing_text('請使用uname -m指令來檢查你的Linux作業系統是32位元或是[敏感词已被屏蔽]位元') == '請使用 uname -m 指令來檢查你的 Linux 作業系統是 32 位元或是 [敏感词已被屏蔽] 位元'
+        assert pangumd.spacing('請使用uname -m指令來檢查你的Linux作業系統是32位元或是[敏感词已被屏蔽]位元') == '請使用 uname -m 指令來檢查你的 Linux 作業系統是 32 位元或是 [敏感词已被屏蔽] 位元'
 
 
 class TestSpacingFile(TestPangu):
