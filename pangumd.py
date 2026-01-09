@@ -86,7 +86,7 @@ def convert_to_fullwidth(symbols):
 
 def _protect_markdown_syntax(text):
     """
-    Protect markdown bold and italic syntax by replacing them with placeholders.
+    Protect markdown code blocks, markdown links, URL anchors, bold and italic syntax by replacing them with placeholders.
     Returns a tuple of (protected_text, patterns_list).
     """
     markdown_patterns = []
@@ -94,9 +94,21 @@ def _protect_markdown_syntax(text):
         markdown_patterns.append(match.group(0))
         return f'\x00MARKDOWN{len(markdown_patterns) - 1}\x00'
     
-    # Protect inline code patterns first (before bold/italic)
+    # Protect code blocks first (before inline code, bold/italic)
+    # Match ```code```
+    protected_text = re.sub(r'```[\s\S]*?```', protect_markdown, text)
+    
+    # Protect markdown links (before inline code, bold/italic)
+    # Match [text](url)
+    protected_text = re.sub(r'\[[^\]]+\]\([^\)]+\)', protect_markdown, protected_text)
+    
+    # Protect URL anchors (before inline code, bold/italic)
+    # Match https://...#CJK or http://...#CJK
+    protected_text = re.sub(r'https?://[^\s)]+#[{CJK}]+'.format(CJK=CJK), protect_markdown, protected_text)
+    
+    # Protect inline code patterns (before bold/italic)
     # Match `code` but not ```code``` (code blocks)
-    protected_text = re.sub(r'(?<!`)`([^`\n]+)`(?!`)', protect_markdown, text)
+    protected_text = re.sub(r'(?<!`)`([^`\n]+)`(?!`)', protect_markdown, protected_text)
     
     # Protect **text** patterns (but not inside backticks)
     protected_text = re.sub(r'(?<!`)(\*\*)([^*`]+?)(\*\*)(?!`)', protect_markdown, protected_text)
@@ -182,16 +194,6 @@ def spacing(text):
     Perform paranoid text spacing on text.
     """
     if len(text) <= 1 or not ANY_CJK.search(text):
-        return text
-    
-    # If text contains markdown code blocks (```), skip processing to preserve them
-    if '```' in text:
-        return text
-    
-    # If text contains multiple lines (not just trailing newline), it might be a markdown document, return as-is
-    # Count the number of newlines, ignoring trailing newline
-    text_without_trailing_newline = text.rstrip('\n')
-    if '\n' in text_without_trailing_newline and text_without_trailing_newline.count('\n') > 1:
         return text
 
     new_text = text
