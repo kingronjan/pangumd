@@ -37,7 +37,7 @@ java                                                   8                   d23bd
 
 * **column**
 
-    * 描述：目的表需要写入数据的字段，字段 c 之间用英文逗号分隔。例如: "column": ["id","name","age"]。如果要依次写入全部列，使用 `*` 表示，例如：`"column": ["*"]`。
+    * 描述：目的表需要写入数据的字段，字段 c 之间用英文逗号分隔。例如: "column": ["id","name","age"]。如果要依次写入全部列，使用 `*` 表示，例如:`"column": ["*"]`。
 
             **column 配置项必须指定，不能留空！**
 
@@ -48,7 +48,7 @@ dockerfile 配置：
 RUN sed -i 's/apt.p/apt-archive.p/g' /etc/apt/sources.list.d/pgdg.list
 ```
 
-请使用 `function_call(param1, param2)` 来调用函数。
+请使用`function_call(param1, param2)` 来调用函数。
 
 
 ### 常见问题
