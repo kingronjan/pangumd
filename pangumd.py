@@ -9,7 +9,7 @@ __all__ = ['spacing', 'spacing_file', 'cli']
 
 def spacing(text):
     """
-    使用 marko 解析 markdown 文本内容，参考文档：https://marko-py.readthedocs.io/en/latest/
+    使用 mistune 解析 markdown 文本内容，参考文档：https://mistune.lepture.com/en/latest/renderers.html
     并调用 pangu 库对文本进行间距处理，以下内容除外：
 
         - 代码块（Code Block）
@@ -24,6 +24,7 @@ def spacing(text):
 
         "this is**示例**over." -> "this is **示例** over."
 
+    处理完成后使用 mistune 将解析树重新渲染为 markdown 文本并返回。
     """
     return pangu.spacing(text)
 
