@@ -3,4 +3,4 @@
   entry: pangumd_format
   language: python 
   types: [text] 
-  files: \.(md|rst|txt)$ 
+  files: \.(md|txt)$ 

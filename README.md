@@ -81,7 +81,7 @@ repos:
     rev: 0.1.1 
     hooks:
       - id: pangumd
-        files: \.(md|txt|rst)$
+        files: \.(md|txt)$
 ```
 
 然后安装钩子：
