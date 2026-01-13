@@ -1,0 +1,6 @@
+- id: pangumd 
+  name: pangumd
+  entry: pangufiles
+  language: python 
+  types: [text] 
+  files: \.(md|rst|txt)$ 
