@@ -29,7 +29,7 @@ dependencies = [
 
 [project.scripts]
 pangumd = "pangumd:cli"
-pangufiles = "pangumd:cli"
+pangumd_format = "pangumd:format"
 
 [project.urls]
 "Homepage" = "https://github.com/kingronjan/pangumd"
