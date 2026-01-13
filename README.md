@@ -59,7 +59,7 @@ To use pangumd as a pre-commit hook, add the following to your `.pre-commit-conf
 ```yaml
 repos:
   - repo: https://github.com/kingronjan/pangumd
-    rev: 0.1.0 
+    rev: 0.1.1 
     hooks:
       - id: pangumd
         files: \.(md|txt|rst)$
