@@ -6,12 +6,36 @@
 
 这个版本在原项目的基础上，为 Markdown 语法增加了特别的适配，确保在 Markdown 文档中能正确处理文本间距。
 
-### 当前的 Markdown 适配
+## 对于 Markdown 适配
 
 1.  **代码块** - 保持代码块的格式，不会添加多余的空格。
 2.  **粗体文本** - 正确处理 `**粗体文本**` 语法，在粗体标记周围添加适当的间距。
 3.  **斜体文本** - 支持 `*斜体文本*` 语法。
 4.  **中文链接** - 为包含中文字符的超链接提供正确的间距。
+
+### 示例
+
+下面是一个示例，展示了 `pangumd` 如何在处理文本的同时，智能地保留 Markdown 的特定格式。
+
+#### 处理前
+
+```markdown
+首先在**能联网**的机器安装docker，并pull 想要安装的镜像，完成后，使用 `docker save`命令导出镜像：
+
+### 参考
+
+1. [docker save与docker export 的区别 - jingsam](https://jingsam.github.io/2017/08/26/docker-save-and-docker-export.html#你好)
+```
+
+#### 处理后
+
+```markdown
+首先在**能联网**的机器安装 docker，并 pull 想要安装的镜像，完成后，使用 `docker save` 命令导出镜像：
+
+### 参考
+
+1. [docker save 与 docker export 的区别 - jingsam](https://jingsam.github.io/2017/08/26/docker-save-and-docker-export.html#你好)
+```
 
 ## 安装
 

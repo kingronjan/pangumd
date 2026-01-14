@@ -2,6 +2,8 @@ from textwrap import dedent
 
 import pangumd
 
+from .utils import get_fixture_path
+
 
 def test_strong_emphasis():
     assert pangumd.spacing_text('Hello**你好**吗') == 'Hello **你好**吗'
@@ -33,15 +35,16 @@ def test_indent_after_blank_line():
     assert pangumd.spacing_text(text) == text
 
 
-# def test_all():
-#     filepath = get_fixture_path('all.md')
-#     fix_filepath = get_fixture_path('all_fixed.md')
+def test_all():
+    filepath = get_fixture_path('all.md')
+    formatted_filepath = get_fixture_path('all_formatted.md')
 
-#     with open(filepath, "r", encoding="utf-8") as f:
-#         markdown_content = f.read()
+    with (
+        open(filepath, encoding='utf-8') as f_raw,
+        open(formatted_filepath, encoding='utf-8') as f_formatted,
+    ):
+        markdown_content = f_raw.read()
+        fixed_content = f_formatted.read()
 
-#     with open(fix_filepath, "r", encoding="utf-8") as f:
-#         fixed_content = f.read()
-
-#     spaced_content = pangumd.spacing(markdown_content)
-#     assert spaced_content == fixed_content
+    spaced_content = pangumd.spacing(markdown_content)
+    assert spaced_content == fixed_content

@@ -1,0 +1,15 @@
+{
+    "general": {
+        "preferredEditor": "code"
+    },
+    "ui": {
+        "hideBanner": true
+    },
+    "tools": {
+        "allowed": [
+            "run_shell_command(git)",
+            "run_shell_command(uv)"
+        ],
+        "autoAccept": true
+    }
+}
