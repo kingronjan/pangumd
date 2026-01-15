@@ -78,12 +78,19 @@ class SpacingMarkdownRenderer(MarkdownRenderer):
         return ' '
 
     def render_line_break(self, element):
-        self._last_char = None
+        self._reset_last()
         return super().render_line_break(element)
 
     def render_blank_line(self, element):
-        self._last_char = None
+        self._reset_last()
         return super().render_blank_line(element)
+    
+    def render_list_item(self, element):
+        self._reset_last()
+        return super().render_list_item(element)
+    
+    def _reset_last(self):
+        self._last_char = None
 
 
 def spacing(text):

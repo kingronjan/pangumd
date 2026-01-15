@@ -35,6 +35,13 @@ def test_indent_after_blank_line():
     assert pangumd.spacing_text(text) == text
 
 
+def test_link_not_modified():
+    text = dedent("""
+    - [分享个人在用的 IFLOW 编程全局提示词](https://vibex.iflow.cn/t/topic/257) 等
+    - [awesome-cursor-rules-mdc/rules-mdc/python.mdc](https://github.com/sanjeed5/awesome) 参考价值""")
+    assert pangumd.spacing_text(text) == text    
+
+
 def test_all():
     filepath = get_fixture_path('all.md')
     formatted_filepath = get_fixture_path('all_formatted.md')
