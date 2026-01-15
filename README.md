@@ -102,7 +102,7 @@ $ echo "你从什么时候开始产生了我没使用Monkey Patch的错觉?" | p
 ```yaml
 repos:
   - repo: https://github.com/kingronjan/pangumd
-    rev: 0.1.1 
+    rev: 0.1.2 
     hooks:
       - id: pangumd
         files: \.(md|txt)$

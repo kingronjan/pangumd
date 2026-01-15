@@ -8,7 +8,7 @@ import pangu
 from marko import Markdown
 from marko.md_renderer import MarkdownRenderer
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __all__ = ['spacing', 'spacing_file', 'cli']
 
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pangumd"
-version = "0.1.1"
+version = "0.1.2"
 description = "Intelligently adds spacing between CJK and alphanumeric characters with special handling for Markdown."
 readme = "README.md"
 requires-python = ">=3.13"
