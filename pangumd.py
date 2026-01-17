@@ -61,7 +61,7 @@ class SpacingMarkdownRenderer(MarkdownRenderer):
     def get_prefix_space(self, char):
         empty = ''
 
-        if not self._last_char:
+        if not self._last_char or self._last_char.isspace():
             return empty
 
         c = unicodedata.category(char)

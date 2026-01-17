@@ -39,7 +39,16 @@ def test_link_not_modified():
     text = dedent("""
     - [分享个人在用的 IFLOW 编程全局提示词](https://vibex.iflow.cn/t/topic/257) 等
     - [awesome-cursor-rules-mdc/rules-mdc/python.mdc](https://github.com/sanjeed5/awesome) 参考价值""")
-    assert pangumd.spacing_text(text) == text    
+    assert pangumd.spacing_text(text) == text
+
+
+def test_list_item_with_checkbox():
+    text = dedent("""
+    ### 面试资料
+
+    - [ ] [Python/SQL/Django 面試題 - HackMD](https://hackmd.io/@_FqBW8dGS8a5ZqhdMwvpuA/ByYoWaxfD#Python%E7%89%B9%E6%80%A7%EF%BC%9A)
+    - [ ] [taizilongxu/interview_python: 关于 Python 的面试题](https://github.com/taizilongxu/interview_python)""")
+    assert pangumd.spacing_text(text) == text
 
 
 def test_all():
