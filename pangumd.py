@@ -18,6 +18,7 @@ class SpacingMarkdownRenderer(MarkdownRenderer):
         self._last_char = None
         self._prefix_spaces = []
         self._add_prefix_to_raw = True
+        self._spacing = True
 
     @contextmanager
     def no_prefix_for_raw(self):
@@ -25,7 +26,16 @@ class SpacingMarkdownRenderer(MarkdownRenderer):
         yield
         self._add_prefix_to_raw = True
 
+    @contextmanager
+    def no_spacing_for_raw(self):
+        self._spacing = False
+        yield
+        self._spacing = True
+
     def render_raw_text(self, element):
+        if (not element.children) or (not self._spacing):
+            return element.children
+
         text = pangu.spacing(element.children)
         prefix = self.get_prefix_space(element.children[0])
 
@@ -84,11 +94,15 @@ class SpacingMarkdownRenderer(MarkdownRenderer):
     def render_blank_line(self, element):
         self._reset_last()
         return super().render_blank_line(element)
-    
+
     def render_list_item(self, element):
         self._reset_last()
         return super().render_list_item(element)
     
+    def render_fenced_code(self, element):
+        with self.no_spacing_for_raw():
+            return super().render_fenced_code(element)
+
     def _reset_last(self):
         self._last_char = None
 

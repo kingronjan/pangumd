@@ -5,7 +5,7 @@
 ```bash
 # 将 java:8 的镜像导出成 tar 文件
 # java:8 为镜像名
-docker save java:8 -o java.tar  
+docker save java:8 -o java.tar
 ```
 
 导出后将tar 文件上传到需要安装的 docker服务器，使用如下命令导入镜像文件：
