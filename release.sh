@@ -3,16 +3,6 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# --- Validation ---
-if [ -z "$1" ]; then
-  echo "Error: No version specified."
-  echo "Usage: ./release.sh <version>"
-  exit 1
-fi
-
-NEW_VERSION=$1
-echo "Releasing version $NEW_VERSION..."
-
 # --- Get Current Version ---
 # Using grep and cut to extract the version string from pyproject.toml
 CURRENT_VERSION=$(grep -E "^version = \"[0-9]+\.[0-9]+\.[0-9]+\"$" pyproject.toml | cut -d '"' -f 2)
@@ -21,6 +11,16 @@ if [ -z "$CURRENT_VERSION" ]; then
   echo "Error: Could not find current version in pyproject.toml"
   exit 1
 fi
+
+# --- Validation ---
+if [ -z "$1" ]; then
+  echo "Error: No version specified, current version is $CURRENT_VERSION"
+  echo "Usage: ./release.sh <version>"
+  exit 1
+fi
+
+NEW_VERSION=$1
+echo "Releasing version $NEW_VERSION..."
 
 echo "Current version: $CURRENT_VERSION, New version: $NEW_VERSION"
 
